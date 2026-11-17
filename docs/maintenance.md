@@ -1,17 +1,18 @@
 # Maintenance / 维护
 
-Run commands from the source plugin directory. Python 3 is only a maintainer
-dependency. Download current upstream dictionaries and the Mozc table explicitly;
+Run commands from the source plugin directory. Regeneration needs Python 3,
+Neovim 0.11+ and a flash-any.nvim checkout. Download upstream dictionaries and the Mozc table explicitly;
 the build script never downloads or changes upstream files.
-以下命令在 source 包目录执行。Python 仅供维护者使用；构建脚本不联网。
+以下命令在 source 包目录执行。重新生成需要 Python、Neovim 和核心仓库；构建脚本不联网。
 
 ```sh
+export FLASH_ANY_ROOT=/absolute/path/to/flash-any.nvim
 curl -fL https://www.edrdg.org/pub/Nihongo/JMdict_e.gz -o /tmp/JMdict_e.gz
 curl -fL https://www.edrdg.org/kanjidic/kanjidic2.xml.gz -o /tmp/kanjidic2.xml.gz
 curl -fL https://raw.githubusercontent.com/google/mozc/master/src/data/preedit/romanji-hiragana.tsv -o /tmp/romanji-hiragana.tsv
 python3 scripts/build.py /tmp/JMdict_e.gz /tmp/kanjidic2.xml.gz /tmp/romanji-hiragana.tsv
 python3 tests/build.py
-FLASH_ANY_ROOT=/absolute/path/to/flash-any.nvim nvim --clean -l tests/run.lua
+nvim --clean -l tests/run.lua
 ```
 
 Keep the input snapshots to reproduce their hashes. `data.json` records compressed
@@ -20,6 +21,24 @@ is deterministic for the same inputs. Update dictionaries regularly and review t
 new counts, unsupported readings and licence notices when updating snapshots.
 保留原始输入以便复现；同一输入生成相同 TSV 和 manifest。定期更新数据，复查数量、
 不支持读音和上游声明，并同步 THIRD_PARTY.md 的日期及数量。
+
+After extraction, scripts/prune.lua removes a multi-character reading only when
+its canonical group sequence can be concatenated from the retained single-character
+group sequences. It reuses kana.split(), preserving contracted kana, contextual
+doubled consonants, iteration-mark handling and spelling alternatives. Single-character
+entries and readings that cannot be segmented are retained. The pass is idempotent;
+data.json records the removed reading count. No word is removed merely because one
+of its other readings is redundant.
+
+This preserves complete-reading searches through the core's adjacent-character
+matching. Partial-query candidates and highlighting can change when a redundant
+phrase no longer contributes its own candidate. Character-motion phrase fallbacks
+can also change; the reduction targets ordinary jump searches.
+
+提取后复用运行时分音函数，仅删除音节组可由单字音节组完整拼接的多字读音。
+逐读音删除，保留同词的特殊读音、跨字拗音和促音组；单字及无法分音的读音不删除。
+普通跳转的完整读音仍由核心跨字匹配；输入过程中的候选、高亮和字符动作的词组
+回退可能随整词条目删除而变化。重复运行精简步骤不会继续删减。
 
 The shipped TSV retains kana readings. The factory supplies the file, converter
 and groups. `kana.split()` converts a contiguous kana reading to space-separated
@@ -33,7 +52,7 @@ the source's Lua/TSV files; restart Neovim after updating them.
 词典收录负责汉字词的真实读音；促音和拗音在分音时处理，不按汉字各自拼读词组。
 converter 仅在构建缓存时执行，查询由 C 逐组匹配，更新后重启 Neovim。
 
-The current snapshot has 227211 distinct reading strings. The segmenter expands
+The reduced snapshot has 116605 distinct reading strings. The segmenter expands
 hiragana and katakana iteration marks using the previous full-size kana: an unvoiced
 mark repeats its unvoiced form, and a voiced mark repeats its voiced form. For example,
 いすゞ becomes いすず and こゝろ becomes こころ. Marks without a valid preceding kana

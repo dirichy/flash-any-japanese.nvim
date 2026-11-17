@@ -52,6 +52,68 @@ do
 end
 collectgarbage("collect")
 local native = require("flash-any.native")
+do
+	local fixture = {
+		"寿\tす",
+		"司\tし",
+		"寿司\tすし",
+		"今\tこん",
+		"日\tにち",
+		"今日\tこんにち",
+		"今日\tきょう",
+		"き\tき",
+		"ゃ\tゃ",
+		"きゃ\tきゃ",
+		"っ\tっ",
+		"こ\tこ",
+		"っこ\tっこ",
+		"ゝ\tゝ",
+		"未知\tみち",
+	}
+	local full, pruned = cache .. "/full.tsv", cache .. "/pruned.tsv"
+	vim.fn.writefile(fixture, full)
+	vim.fn.writefile(fixture, pruned)
+	local result = vim.system({ vim.v.progpath, "--clean", "-l", root .. "/scripts/prune.lua", pruned }):wait()
+	assert(result.code == 0, result.stderr)
+	local remaining = build.read(pruned, { format = "tsv" })
+	assert(remaining["寿司"] == nil)
+	assert(vim.deep_equal(remaining["今日"], { "きょう" }))
+	assert(remaining["きゃ"] and remaining["っこ"] and remaining["未知"] and remaining["ゝ"])
+	local once = vim.fn.readfile(pruned)
+	result = vim.system({ vim.v.progpath, "--clean", "-l", root .. "/scripts/prune.lua", pruned }):wait()
+	assert(result.code == 0, result.stderr)
+	assert(vim.deep_equal(once, vim.fn.readfile(pruned)), "pruning must be idempotent")
+	for _, matcher in ipairs({ "full_code", "initial", "prefix", "letter" }) do
+		local function load(file)
+			return native.load(nil, {
+				{
+					name = "japanese",
+					file = file,
+					format = "tsv",
+					converter = root .. "/lua/flash-any/japanese/converter.lua",
+					groups = kana.groups,
+					matcher = matcher,
+				},
+			})
+		end
+		local before, after = load(full), load(pruned)
+		for _, sample in ipairs({
+			{ "寿司 with flash", "sushi with flash" },
+			{ "寿司", "susi" },
+			{ "寿司", "ss" },
+			{ "寿司", "sus" },
+			{ "今日", "konnichi" },
+			{ "今日", "kyou" },
+			{ "きゃ", "kya" },
+			{ "っこ", "kko" },
+		}) do
+			local query = sample[2]
+			local old = before:new_state():scan(0, 0, 1, 1, 1, { sample[1] }, query, nil)
+			local new = after:new_state():scan(0, 0, 1, 1, 1, { sample[1] }, query, nil)
+			assert(vim.deep_equal(old, new), matcher .. ": " .. sample[1] .. " / " .. query)
+		end
+	end
+end
 local book = native.load(nil, { "japanese" })
 for _, example in ipairs({
 	{ "寿司", "sushi" },

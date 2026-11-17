@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Extract kana readings from local JMdict/KANJIDIC2 and spellings from Mozc.
 
-Python is only needed by maintainers. Reading segmentation happens in the Lua
-converter at dictionary-build time, not in this script or at search time.
+Python, Neovim and a core checkout are only needed by maintainers. Pruning reuses
+the runtime Lua segmenter; searches use the compiled core.
 """
 import argparse
 import gzip
 import hashlib
 import json
+import os
+import subprocess
 from pathlib import Path
 import unicodedata
 import xml.etree.ElementTree as ET
@@ -81,6 +83,8 @@ def main():
     parser.add_argument('kanjidic', type=Path)
     parser.add_argument('mozc', type=Path)
     args = parser.parse_args()
+    if not os.environ.get('FLASH_ANY_ROOT'):
+        parser.error('set FLASH_ANY_ROOT to the flash-any.nvim checkout for pruning')
     root = Path(__file__).resolve().parents[1]
     groups = read_mozc(args.mozc)
     rows = build(args.jmdict, args.kanjidic, groups)
@@ -90,10 +94,19 @@ def main():
             for text in sorted(data):
                 for code in sorted(data[text]):
                     output.write(f'{text}\t{code}\n')
+    # Reuse the runtime segmenter: raw kana concatenation would incorrectly
+    # discard contracted and doubled-consonant groups spanning text characters.
+    subprocess.run(['nvim', '--clean', '-l', str(root / 'scripts/prune.lua'),
+                    str(root / 'lua/flash-any/tables/japanese.tsv')], check=True)
+    retained = {}
+    for line in (root / 'lua/flash-any/tables/japanese.tsv').read_text(encoding='utf-8').splitlines():
+        text, reading = line.split('\t')
+        retained.setdefault(text, set()).add(reading)
     manifest = {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
                 for path in (args.jmdict, args.kanjidic, args.mozc)}
-    manifest['entries'] = len(rows)
-    manifest['readings'] = sum(map(len, rows.values()))
+    manifest['entries'] = len(retained)
+    manifest['readings'] = sum(map(len, retained.values()))
+    manifest['redundant_readings_removed'] = sum(map(len, rows.values())) - manifest['readings']
     manifest['kana_groups'] = len(groups)
     (root / 'data.json').write_text(json.dumps(manifest, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(manifest, indent=2))

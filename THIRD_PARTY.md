@@ -24,9 +24,15 @@ boundary hyphens are removed. Readings are NFKC-normalized and katakana is mappe
 to hiragana. Duplicate pairs, glosses, frequencies and other metadata are omitted.
 Original dictionary copyright remains with James William Breen and EDRDG.
 
+Multi-character reading pairs reproducible by concatenating the runtime kana group
+sequences of individual characters are omitted. Other readings of the same text
+remain, including special word readings and groups spanning character boundaries.
+
 提取文字与读音，保留 JMdict 的读音适用范围，补充假名文字和汉字音训。
 单字训读省略送假名后缀，去掉读音边界连字符；读音转 NFKC 和平假名，去重并省略释义等字段。
-提取文件含 476130 个文字条目、517289 个读音对；并非所有读音都有罗马音匹配。
+提取后逐读音移除可由单字音节组拼接的冗余项，保留特殊词读音及跨字音节组。
+精简文件含 159293 个文字条目、188590 个读音对，移除了 328699 个冗余读音对；
+并非所有读音都有罗马音匹配。
 Data was retrieved on 2026-11-17; source hashes and counts are recorded in [data.json](data.json).
 
 ## Mozc spelling table
