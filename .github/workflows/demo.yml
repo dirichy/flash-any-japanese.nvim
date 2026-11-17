@@ -10,10 +10,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   record:
-    # Pin both refs to the same released commit for reproducible recordings.
-    uses: dirichy/flash-any.nvim/.github/workflows/table-demo.yml@433b7fe3c197e757492f3015693bbf7096423939
+    # Follow the latest core recorder and implementation on each new run.
+    uses: dirichy/flash-any.nvim/.github/workflows/table-demo.yml@main
     with:
-      flash-any-ref: 433b7fe3c197e757492f3015693bbf7096423939
+      flash-any-ref: main
       table-ref: ${{ github.sha }}
       config: demo.lua
 

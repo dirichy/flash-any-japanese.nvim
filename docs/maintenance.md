@@ -80,11 +80,14 @@ this package's ignored demos/output directory. Keep generated media out of Git.
 录制产物保存在核心的 demos/output；包内同名目录仅供本地预览，不提交到 Git。
 
 The [demo workflow](https://github.com/dirichy/flash-any-japanese.nvim/actions/workflows/demo.yml)
-runs on main pushes and manual dispatch. Both uses and flash-any-ref are pinned
-to the same published core commit. When updating the recorder, update both refs
-together and review the resulting recording and verification reports.
-工作流在 main 推送或手动触发时运行。升级录制器时，同时更新两处核心提交引用，
-并检查生成的画面及验证报告。
+runs on main pushes and manual dispatch. Both uses and flash-any-ref follow the
+core's main branch, so each new run uses the latest published recorder and core.
+Core pushes alone do not trigger this workflow; start a new manual run after a
+core update. Review the resulting recording and verification reports. To reproduce
+a specific core revision, temporarily set both refs to that same commit SHA.
+工作流在 main 推送或手动触发时运行，两处核心引用均跟随 main，自动使用最新代码。
+仅推送核心仓库不会触发此工作流；核心更新后请手动发起一次新运行，并检查画面及
+验证报告。若需复现特定核心版本，可临时将两处引用改为同一个提交 SHA。
 
 Successful recordings on main publish GIF, MP4, PNG and JSON reports to the demos
 prerelease. Workflow artifacts also include README.local.md and recording logs.
