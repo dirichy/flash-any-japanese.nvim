@@ -5,7 +5,9 @@
 为 [flash-any.nvim](https://github.com/dirichy/flash-any.nvim) 提供日语罗马音搜索：
 覆盖假名、汉字和词典中的词组，用 JMdict、KANJIDIC2 提供读音，逐音节共享拼写变体。
 
-[演示录制与验证结果](https://github.com/dirichy/flash-any-japanese.nvim/actions/workflows/demo.yml)
+![用罗马音搜索并跳转](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.gif)
+
+[MP4](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.mp4) · [验证报告](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table-verification.json)
 
 ## 安装
 

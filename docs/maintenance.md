@@ -91,12 +91,12 @@ a specific core revision, temporarily set both refs to that same commit SHA.
 
 Successful recordings on main publish GIF, MP4, PNG and JSON reports to the demos
 prerelease. Workflow artifacts also include README.local.md and recording logs.
-The READMEs link to the workflow while the demos release has no published assets.
-After the first successful publication, replace those links with the GIF embed,
-MP4 and table-verification.json release asset links. Do not link to ignored local files.
+The READMEs embed the GIF and link to the MP4 and verification JSON using the
+stable release asset URLs below. Successful publications replace those assets,
+so the links continue to show the latest recording without README edits.
 main 上录制成功后，媒体及 JSON 报告发布到 demos 预发布；工作流附件还包含本地报告
-和录制日志。首次发布附件后，再将各语言 README 的工作流入口替换为 GIF、MP4 及
-验证 JSON 的发布附件链接：
+和录制日志。各语言 README 使用以下固定附件地址；后续发布替换同名附件，
+无需再次修改 README。不要链接到被 Git 忽略的本地文件。
 
 ```text
 https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.gif

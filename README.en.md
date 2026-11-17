@@ -6,7 +6,9 @@ Search kana, kanji and dictionary words with romaji in
 [flash-any.nvim](https://github.com/dirichy/flash-any.nvim).
 Uses JMdict and KANJIDIC2 readings, with spelling variants shared per syllable.
 
-[Demo recordings and verification](https://github.com/dirichy/flash-any-japanese.nvim/actions/workflows/demo.yml)
+![Search and jump with romaji](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.gif)
+
+[MP4](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.mp4) · [Verification report](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table-verification.json)
 
 ## Install
 

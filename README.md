@@ -6,7 +6,9 @@
 ローマ字で検索してジャンプします。JMdict と KANJIDIC2 の読みを使い、
 `shi/si`、`chi/ti` などの入力を音節ごとに組み合わせられます。
 
-[デモ録画と検証結果](https://github.com/dirichy/flash-any-japanese.nvim/actions/workflows/demo.yml)
+![ローマ字で検索してジャンプ](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.gif)
+
+[MP4](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table.mp4) · [検証結果](https://github.com/dirichy/flash-any-japanese.nvim/releases/download/demos/table-verification.json)
 
 ## インストール
 
